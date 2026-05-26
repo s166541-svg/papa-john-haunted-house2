@@ -1,16 +1,27 @@
 // --- FILE: Main.java ---
 /*
-* Serves as the primary entry point framework execution driver for the application.
-* Boots up resources by initializing a Game architecture object instance, then delegates
-* tracking to the active core loops.
+
+Main application entry framework required by standard execution guidelines.
+
+Instantiates the main Game manager instance and sets up the live play context.
 */
 public class Main {
-/**
-* Main runtime program execution sequence.
-* @param args command-line structural arrays passed into program execution
+/*
+
+Default constructor for the entry framework class.
+*/
+public Main() {
+// Standard implicit constructor declaration
+}
+
+/*
+
+Invokes the game initialization sequences.
+
+@param args standard console parameter arrays passed down at launch times
 */
 public static void main(String[] args) {
-Game game = new Game();
-game.start();
+Game softwareEngine = new Game();
+softwareEngine.start();
 }
 }
