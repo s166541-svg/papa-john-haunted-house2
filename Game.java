@@ -43,8 +43,8 @@ private void initializeRooms() {
 rooms = new ArrayList<Room>();
 
 // Instantiate all rooms with core data
-Room outside = new Room("Outside", "You are standing in a dark forest filled with giant redwood trees. The air is chilly, and the cabin North of you looks very old and shaky. The porch is broken, and some of the windows have cracks in them. To your East, there is a heavy cellar door with a lock. To your West, a small path leads around to the back of the house.");
-outside.setAlternateDescription("You take a deep breath, exhilarated from the horrors you experienced in the haunted house. As you close the door behind you, the only option is to head to the basement and find out what’s inside. To your East, there is the coveted basement you finally have the key for. To your West, there is the same path you walked down so long ago.");
+Room outside = new Room("Outside", "You are standing in a dark forest filled with giant redwood trees. The air is chilly, and the cabin North of you looks very old and shaky. The porch is broken, and some of the windows have cracks in them. To your West, there is a heavy cellar door with a lock. To your East, a small path leads around to the back of the house.");
+outside.setAlternateDescription("You take a deep breath, exhilarated from the horrors you experienced in the haunted house. As you close the door behind you, the only option is to head to the basement and find out what’s inside. To your West, there is the coveted basement you finally have the key for. To your East, there is the same path you walked down so long ago.");
 
 Room mainEntrance = new Room("Main Entrance", "The moment you step inside, the door thuds shut, locking out the wind. The air here is stale and smells like old paper. It is very dim, and every step you take makes the floorboards groan like they are complaining. To the West, you hear a slow, heavy snoring sound—huff... wheeze...—as if something very big is dreaming nearby. To the East of you seems to be a kitchen. To the North of you is a bathroom.");
 
