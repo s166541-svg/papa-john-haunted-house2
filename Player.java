@@ -1,70 +1,81 @@
 import java.util.ArrayList;
 import java.util.Scanner;
 // --- FILE: Player.java ---
-
+import java.util.ArrayList;
 
 /*
-* Tracks individual status attributes and equipment inventories of the user.
-* Coordinates player inventory storage and maintains spatial tracking of the active room.
-* Utilized across Game logic streams to inspect or update items carried.
+
+Tracks the main player inventory state and active spatial room positioning.
+
+Operates additions and reductions of components acquired via text interaction.
+
+Interacts directly with Game processes during item pickup and room navigation updates.
 */
 public class Player {
 private ArrayList<Item> inventory;
 private Room currentRoom;
 
 /*
-* Initializes the player with a clean inventory state.
+
+Prepares a fresh player container with initialized empty list collections.
 */
 public Player() {
 this.inventory = new ArrayList<Item>();
 }
 
 /*
-* Returns the current room resource coordinates.
-* @return the Room entity currently occupied
+
+Identifies where the player is currently positioned.
+
+@return the active Room object reference
 */
 public Room getCurrentRoom() {
-return this.currentRoom;
+return currentRoom;
 }
 
 /*
-* Shifts player coordinates to a new target room location.
-* @param currentRoom the destination Room object
+
+Sets the location parameter of the player character.
+
+@param room the new room anchor point
 */
-public void setCurrentRoom(Room currentRoom) {
-this.currentRoom = currentRoom;
+public void setCurrentRoom(Room room) {
+this.currentRoom = room;
 }
 
 /*
-* Commits an item item into the tracking array list.
-* @param item the item block to add
+
+Safely appends an item object into the player's private inventory file.
+
+@param item the target object to save
 */
 public void addItem(Item item) {
-this.inventory.add(item);
+inventory.add(item);
 }
 
 /*
-* Extracts an item asset using safe sequential index logic.
-* @param name the explicit string name of the object to look up and purge
+
+Extracts an item component out of the personal tracking array list by positional integer.
+
+@param index the index reference to destroy
 */
-public void removeItem(String name) {
-// Manual loop required — built-in search methods are not allowed per AP CS A constraints
-for (int i = 0; i < this.inventory.size(); i++) {
-if (this.inventory.get(i).getName().equalsIgnoreCase(name)) {
-this.inventory.remove(i);
-break;
-}
-}
+public void removeItem(int index) {
+inventory.remove(index);
 }
 
 /*
-* Traverses inventory contents to locate an item match.
-* @param name the lookup string of the item sought
-* @return the Item matching the name parameter, or null if unassigned
+
+Iterates inventory to search for matching names without using native list shortcuts.
+
+Manual loop required — built-in search methods are not allowed per AP CS A constraints.
+
+@param name the raw string sequence to find
+
+@return the matching discovered Item link, or null if missing
 */
 public Item findItem(String name) {
 // Manual loop required — built-in search methods are not allowed per AP CS A constraints
-for (Item item : this.inventory) {
+for (Item item : inventory) {
 if (item.getName().equalsIgnoreCase(name)) {
 return item;
 }
@@ -73,10 +84,12 @@ return null;
 }
 
 /*
-* Yields direct lookup read access to the master inventory tracker.
-* @return the raw inventory collection list
+
+Gets the full structural listing container of inventory items.
+
+@return the explicit item array list tracking structure
 */
 public ArrayList<Item> getInventory() {
-return this.inventory;
+return inventory;
 }
 }
