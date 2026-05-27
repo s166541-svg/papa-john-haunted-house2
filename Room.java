@@ -2,7 +2,6 @@
 import java.util.ArrayList;
 
 /*
-
 Represents a location within the game world.
 
 This class stores room-specific data including names, descriptions,
@@ -14,11 +13,10 @@ current state of the Game.
 public class Room {
 private String name;
 private String description;
-private ArrayList items;
-private ArrayList exits;
+private ArrayList<Item> items;
+private ArrayList<String> exits;
 
 /*
-
 Constructs a Room with a name and base description.
 
 @param name The unique name of the room.
@@ -28,12 +26,11 @@ Constructs a Room with a name and base description.
 public Room(String name, String description) {
 this.name = name;
 this.description = description;
-this.items = new ArrayList<>();
-this.exits = new ArrayList<>();
+this.items = new ArrayList<Item>();
+this.exits = new ArrayList<String>();
 }
 
 /*
-
 Adds an item to the room's inventory.
 
 @param item The Item object to place in the room.
@@ -43,13 +40,11 @@ items.add(item);
 }
 
 /*
-
 Removes an item from the room by name.
 
 @param itemName The name of the item to remove.
 */
 public void removeItem(String itemName) {
-// Manual loop required - built-in search methods are not allowed per AP CS A constraints
 for (int i = 0; i < items.size(); i++) {
 if (items.get(i).getName().equalsIgnoreCase(itemName)) {
 items.remove(i);
@@ -59,7 +54,6 @@ return;
 }
 
 /*
-
 Defines a connection to another room.
 
 @param direction The direction to travel (e.g., North).
@@ -71,7 +65,6 @@ exits.add(direction + ":" + destination);
 }
 
 /*
-
 Generates the room's description based on the global game state.
 
 @param game The current Game instance to check state flags.
@@ -132,27 +125,24 @@ return description;
 }
 
 /*
-
 Retrieves the list of exits for this room.
 
 @return An ArrayList of exit strings in "Direction:Destination" format.
 */
-public ArrayList getExits() {
+public ArrayList<String> getExits() {
 return exits;
 }
 
 /*
-
 Retrieves the items currently in the room.
 
 @return An ArrayList of Item objects.
 */
-public ArrayList getItems() {
+public ArrayList<Item> getItems() {
 return items;
 }
 
 /*
-
 Retrieves the name of the room.
 
 @return The room's name.
