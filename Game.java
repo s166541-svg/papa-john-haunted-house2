@@ -96,10 +96,10 @@ guestRoom.addExit("East", "Main Entrance");
 basement.addExit("East", "Outside");
 
 // Items
-storage.addItem(new Utility("Flashlight", "A sturdy flashlight with full batteries."));
-guestRoom.addItem(new Utility("Flashlight", "A sturdy flashlight found on the guest bed."));
-garage.addItem(new Weapon("Baseball Bat", "A heavy wooden bat, good for defense."));
-bathroom.addItem(new Utility("Basement Key", "A heavy iron key found in the medicine cabinet."));
+storage.addItem(new UtilityItem("Flashlight", "A sturdy flashlight with full batteries."));
+guestRoom.addItem(new UtilityItem("Flashlight", "A sturdy flashlight found on the guest bed."));
+garage.addItem(new WeaponItem("Baseball Bat", "A heavy wooden bat, good for defense."));
+bathroom.addItem(new UtilityItem("Basement Key", "A heavy iron key found in the medicine cabinet."));
 
 rooms.add(outside);
 rooms.add(mainEntrance);
