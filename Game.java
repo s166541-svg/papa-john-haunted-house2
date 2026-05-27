@@ -3,7 +3,6 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 /*
-
 Manages the game logic, state, and world construction.
 
 This class contains the main game loop, processes user input,
@@ -11,7 +10,7 @@ This class contains the main game loop, processes user input,
 tracks turns, and evaluates win/loss conditions based on student specs.
 */
 public class Game {
-private ArrayList rooms;
+private ArrayList<Room> rooms;
 private Player player;
 private boolean isRunning;
 private Room lastRoom;
@@ -25,7 +24,6 @@ private boolean breakLock = false;
 private int turnCount = 0;
 
 /*
-
 Initializes the game world and player state.
 */
 public Game() {
@@ -33,11 +31,10 @@ initializeGame();
 }
 
 /*
-
 Sets up all rooms, items, and connections.
 */
 private void initializeGame() {
-rooms = new ArrayList<>();
+rooms = new ArrayList<Room>();
 player = new Player();
 isRunning = true;
 turnCount = 0;
@@ -99,10 +96,10 @@ guestRoom.addExit("East", "Main Entrance");
 basement.addExit("East", "Outside");
 
 // Items
-storage.addItem(new UtilityItem("Flashlight", "A sturdy flashlight with full batteries."));
-guestRoom.addItem(new UtilityItem("Flashlight", "A sturdy flashlight found on the guest bed."));
-garage.addItem(new WeaponItem("Baseball Bat", "A heavy wooden bat, good for defense."));
-bathroom.addItem(new UtilityItem("Basement Key", "A heavy iron key found in the medicine cabinet."));
+storage.addItem(new Utility("Flashlight", "A sturdy flashlight with full batteries."));
+guestRoom.addItem(new Utility("Flashlight", "A sturdy flashlight found on the guest bed."));
+garage.addItem(new Weapon("Baseball Bat", "A heavy wooden bat, good for defense."));
+bathroom.addItem(new Utility("Basement Key", "A heavy iron key found in the medicine cabinet."));
 
 rooms.add(outside);
 rooms.add(mainEntrance);
@@ -121,7 +118,6 @@ lastRoom = null;
 }
 
 /*
-
 Starts the game loop.
 */
 public void start() {
@@ -144,7 +140,6 @@ sc.close();
 }
 
 /*
-
 Parses and executes user commands.
 
 @param input The raw string input from the user.
@@ -213,7 +208,6 @@ System.out.println("I don't understand that command.");
 }
 
 /*
-
 Handles player movement logic.
 
 @param direction The direction string provided by the user.
@@ -246,7 +240,6 @@ System.out.println("You can't go that way.");
 }
 
 /*
-
 Handles picking up items.
 
 @param name The name of the item to take.
@@ -287,7 +280,6 @@ if (found != null) {
 }
 
 /*
-
 Increases the turn counter and triggers scheduled events.
 */
 private void incrementTurn() {
@@ -296,7 +288,6 @@ processTurn();
 }
 
 /*
-
 Handles per-turn logic and narrative warnings.
 */
 private void processTurn() {
@@ -311,7 +302,6 @@ isRunning = false;
 }
 
 /*
-
 Evaluates win, loss, and trap conditions based on current state.
 
 @return true if the game should end, false otherwise.
@@ -357,7 +347,6 @@ return false;
 }
 
 /*
-
 Searches for a room by name using a for-each loop.
 
 @param roomName The name of the room to find.
@@ -365,7 +354,6 @@ Searches for a room by name using a for-each loop.
 @return The Room object or null if not found.
 */
 public Room findRoom(String roomName) {
-// Manual loop required - built-in search methods are not allowed per AP CS A constraints
 for (Room r : rooms) {
 if (r.getName().equalsIgnoreCase(roomName)) {
 return r;
@@ -375,7 +363,6 @@ return null;
 }
 
 /*
-
 Getter for hasFlashlight flag.
 
 @return true if player has found a flashlight.
@@ -385,7 +372,6 @@ return hasFlashlight;
 }
 
 /*
-
 Getter for hasBasementKey flag.
 
 @return true if player has the basement key.
@@ -395,22 +381,29 @@ return hasBasementKey;
 }
 
 /*
-
 Getter for hasWeapon flag.
 
-@return true if player has the baseball bat.
+@return true if player has a weapon.
 */
 public boolean isHasWeapon() {
 return hasWeapon;
 }
 
 /*
-
 Getter for hasEatenFood flag.
 
 @return true if player has eaten the dining room food.
 */
 public boolean isHasEatenFood() {
 return hasEatenFood;
+}
+
+/*
+Getter for breakLock flag.
+
+@return true if player broke the basement lock.
+*/
+public boolean isBreakLock() {
+return breakLock;
 }
 }
