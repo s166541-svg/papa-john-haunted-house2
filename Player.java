@@ -11,7 +11,7 @@ This class manages the player's inventory and current location. It interacts
 with the Room and Item classes to facilitate movement and item collection.
 */
 public class Player {
-private ArrayList inventory;
+private ArrayList<Item> inventory;
 private Room currentRoom;
 
 /*
