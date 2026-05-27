@@ -1,27 +1,19 @@
 // --- FILE: Main.java ---
 /*
 
-Main application entry framework required by standard execution guidelines.
+The entry point for the application.
 
-Instantiates the main Game manager instance and sets up the live play context.
+This class instantiates the Game and begins execution.
 */
 public class Main {
 /*
 
-Default constructor for the entry framework class.
-*/
-public Main() {
-// Standard implicit constructor declaration
-}
+Main method to launch the game.
 
-/*
-
-Invokes the game initialization sequences.
-
-@param args standard console parameter arrays passed down at launch times
+@param args command line arguments (not used)
 */
 public static void main(String[] args) {
-Game softwareEngine = new Game();
-softwareEngine.start();
+Game game = new Game();
+game.start();
 }
 }
