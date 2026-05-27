@@ -1,16 +1,18 @@
 // --- FILE: Main.java ---
 /*
 
-The entry point for the application.
+Entry point for Papa John's Haunted House.
 
-This class instantiates the Game and begins execution.
+This class serves as the starting point of the application, responsible for
+
+instantiating the Game class and initiating the game loop.
 */
 public class Main {
 /*
 
-Main method to launch the game.
+Main method that launches the game.
 
-@param args command line arguments (not used)
+@param args Command line arguments (not used).
 */
 public static void main(String[] args) {
 Game game = new Game();
