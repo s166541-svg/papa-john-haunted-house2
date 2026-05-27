@@ -1,48 +1,53 @@
+// --- FILE: Game.java ---
 import java.util.ArrayList;
 import java.util.Scanner;
-// --- FILE: Game.java ---
 
 /*
 
-Manages the central game logic, state, and main loop.
+Manages the game logic, state, and world construction.
 
-This class coordinates interactions between Player, Room, and Items. It
+This class contains the main game loop, processes user input,
 
-handles command parsing, state flags, and turn mechanics.
+tracks turns, and evaluates win/loss conditions based on student specs.
 */
 public class Game {
-private Player player;
 private ArrayList rooms;
+private Player player;
 private boolean isRunning;
-private Scanner scanner;
-private int turnCount;
+private Room lastRoom;
 
-// Global State Flags
-private boolean hasBasementKey = false;
+// Global state flags
 private boolean hasFlashlight = false;
+private boolean hasBasementKey = false;
 private boolean hasWeapon = false;
 private boolean hasEatenFood = false;
 private boolean breakLock = false;
+private int turnCount = 0;
 
 /*
 
-Initializes the game world and sets up the player.
+Initializes the game world and player state.
 */
 public Game() {
-this.player = new Player();
-this.rooms = new ArrayList();
-this.scanner = new Scanner(System.in);
-this.isRunning = true;
-this.turnCount = 0;
-initializeWorld();
+initializeGame();
 }
 
 /*
 
-Creates all rooms, items, and connections per the game specification.
+Sets up all rooms, items, and connections.
 */
-private void initializeWorld() {
-// Create Rooms
+private void initializeGame() {
+rooms = new ArrayList<>();
+player = new Player();
+isRunning = true;
+turnCount = 0;
+hasFlashlight = false;
+hasBasementKey = false;
+hasWeapon = false;
+hasEatenFood = false;
+breakLock = false;
+
+// Room creation
 Room outside = new Room("Outside", "");
 Room mainEntrance = new Room("Main Entrance", "The moment you step inside, the door thuds shut, locking out the wind. The air here is stale and smells like old paper. It is very dim, and every step you take makes the floorboards groan like they are complaining. To the West, you hear a slow, heavy snoring sound—huff... wheeze...—as if something very big is dreaming nearby. To the East of you seems to be a kitchen. To the North of you is a bathroom.");
 Room bathroom = new Room("Bathroom", "");
@@ -55,10 +60,10 @@ Room livingRoom = new Room("Living Room", "");
 Room guestRoom = new Room("Guest Room", "The air here is heavy and still, filled with tiny bits of dust dancing in the dark. Long, grey cobwebs hang from the ceiling like messy decorations. A giant bed with a thick, tattered blanket sits in the center. It looks like someone just got up from a nap, leaving a deep dent in the middle of the mattress. To the North is the living room and to the East is the Main Entrance. Take the Flashlight? “Take Flashlight”");
 Room basement = new Room("Basement", "");
 
-// Add Exits
+// Exits
 outside.addExit("North", "Main Entrance");
-outside.addExit("West", "Backyard");
-outside.addExit("East", "Basement");
+outside.addExit("East", "Backyard");
+outside.addExit("West", "Basement");
 
 mainEntrance.addExit("West", "Guest Room");
 mainEntrance.addExit("East", "Kitchen");
@@ -93,13 +98,12 @@ guestRoom.addExit("East", "Main Entrance");
 
 basement.addExit("East", "Outside");
 
-// Add Items
-guestRoom.addItem(new Utility("Flashlight", "A portable light source."));
-storage.addItem(new Utility("Flashlight", "A portable light source."));
-bathroom.addItem(new Utility("Basement Key", "A heavy iron key."));
-garage.addItem(new Weapon("Baseball Bat", "A sturdy wooden bat."));
+// Items
+storage.addItem(new UtilityItem("Flashlight", "A sturdy flashlight with full batteries."));
+guestRoom.addItem(new UtilityItem("Flashlight", "A sturdy flashlight found on the guest bed."));
+garage.addItem(new WeaponItem("Baseball Bat", "A heavy wooden bat, good for defense."));
+bathroom.addItem(new UtilityItem("Basement Key", "A heavy iron key found in the medicine cabinet."));
 
-// Add rooms to global list
 rooms.add(outside);
 rooms.add(mainEntrance);
 rooms.add(bathroom);
@@ -113,40 +117,37 @@ rooms.add(guestRoom);
 rooms.add(basement);
 
 player.setCurrentRoom(outside);
+lastRoom = null;
 }
 
 /*
 
-Starts the main game loop.
+Starts the game loop.
 */
 public void start() {
-System.out.println("Welcome to Papa John's Haunted House.");
+Scanner sc = new Scanner(System.in);
+System.out.println("Welcome to Papa John's Haunted House!");
+
 while (isRunning) {
-Room current = player.getCurrentRoom();
-System.out.println("\n--- " + current.getName() + " ---");
-System.out.println(current.getDescription(this));
+  System.out.println("---");
+  System.out.println(player.getCurrentRoom().getName());
+  System.out.println(player.getCurrentRoom().getDescription(this));
+  
+  // Check for passive Room deaths/wins immediately after description
+  if (checkConditions()) break;
 
-// Check Win/Loss conditions
-if (current.getName().equalsIgnoreCase("Basement") && hasBasementKey) {
-isRunning = false;
-break;
+  System.out.print("> ");
+  String input = sc.nextLine().toLowerCase();
+  processCommand(input);
 }
-if (current.getName().equalsIgnoreCase("Living Room") && !hasWeapon) {
-isRunning = false;
-break;
-}
-
-System.out.print("\n> ");
-String input = scanner.nextLine().toLowerCase();
-processCommand(input);
-}
+sc.close();
 }
 
 /*
 
-Parses and executes player commands.
+Parses and executes user commands.
 
-@param input the raw string input from the user
+@param input The raw string input from the user.
 */
 public void processCommand(String input) {
 if (input.equals("quit")) {
@@ -155,47 +156,56 @@ return;
 }
 
 if (input.equals("restart")) {
-  resetGame();
+  initializeGame();
   System.out.println("Game restarted.");
   return;
 }
 
 if (input.equals("look")) {
-  System.out.println("Items in the room:");
-  ArrayList<Item> items = player.getCurrentRoom().getItems();
-  for (Item item : items) {
-    System.out.println("- " + item.getName());
-  }
+  System.out.println("Items here: " + player.getCurrentRoom().getItems());
   return;
 }
 
 if (input.equals("inventory")) {
-  System.out.println("Your inventory:");
-  for (Item item : player.getInventory()) {
-    System.out.println("- " + item.getName());
-  }
+  System.out.println("You are carrying: " + player.getInventory());
   return;
 }
 
 if (input.startsWith("go ")) {
-  String direction = input.substring(3).trim();
-  movePlayer(direction);
+  String dir = input.substring(3).trim();
+  movePlayer(dir);
   return;
 }
 
 if (input.startsWith("take ")) {
   String itemName = input.substring(5).trim();
-  handleTake(itemName);
+  takeItem(itemName);
   return;
 }
 
 if (input.equals("eat food")) {
-  handleEatFood();
+  if (player.getCurrentRoom().getName().equals("Dining Room") && !hasEatenFood) {
+    hasEatenFood = true;
+    incrementTurn();
+    if (Math.random() < 0.5) {
+      System.out.println("The food was delicious and revitalizing!");
+    } else {
+      System.out.println("The food was poisoned! You collapse to the floor. Game Over.");
+      isRunning = false;
+    }
+  } else {
+    System.out.println("There is no food here to eat.");
+  }
   return;
 }
 
 if (input.equals("break lock")) {
-  handleBreakLock();
+  if (player.getCurrentRoom().getName().equals("Basement") && !hasBasementKey) {
+    breakLock = true;
+    incrementTurn();
+  } else {
+    System.out.println("There is nothing to break here.");
+  }
   return;
 }
 
@@ -204,130 +214,81 @@ System.out.println("I don't understand that command.");
 
 /*
 
-Logic for moving the player between rooms.
+Handles player movement logic.
 
-@param direction the direction string to match
+@param direction The direction string provided by the user.
 */
 private void movePlayer(String direction) {
 Room current = player.getCurrentRoom();
-String destinationName = null;
 
-for (String exit : current.getExits()) {
-  String[] parts = exit.split(":");
+// Check for locked Basement
+if (current.getName().equals("Outside") && direction.equalsIgnoreCase("west")) {
+  if (!hasBasementKey) {
+    System.out.println("The cellar door is locked. You need a key.");
+    return;
+  }
+}
+
+// Logic for finding the exit
+for (String exitStr : current.getExits()) {
+  String[] parts = exitStr.split(":");
   if (parts[0].equalsIgnoreCase(direction)) {
-    destinationName = parts[1];
-    break;
+    Room nextRoom = findRoom(parts[1]);
+    if (nextRoom != null) {
+      lastRoom = current;
+      player.setCurrentRoom(nextRoom);
+      incrementTurn();
+      return;
+    }
   }
 }
-
-if (destinationName != null) {
-  // Check specific locked path logic
-  if (current.getName().equalsIgnoreCase("Outside") && direction.equalsIgnoreCase("East") && !hasBasementKey) {
-    System.out.println("Upon reaching the basement door. You are unable to open the door.");
-    player.setCurrentRoom(findRoom("Basement"));
-    incrementTurn();
-    return;
-  }
-
-  // Check Death Traps for Garage/Storage
-  if (current.getName().equalsIgnoreCase("Garage") && destinationName.equalsIgnoreCase("Storage")) {
-    System.out.println("DEATH TRAP. As you push open the black metal door from the Garage side, you trigger a hidden tripwire. Before you can even process the sight of the statues, a massive shelf loaded with rusted engine parts collapses from above, pinning you instantly. Game Over.");
-    isRunning = false;
-    return;
-  }
-  if (current.getName().equalsIgnoreCase("Storage") && destinationName.equalsIgnoreCase("Garage")) {
-    System.out.println("DEATH TRAP. You step through the metal door into the garage, but the door slams shut behind you with a mechanical bang. The statues from the previous room begin to push against the wood, trapping you in the freezing dark as the locks hiss shut, leaving you with no way out. Game Over.");
-    isRunning = false;
-    return;
-  }
-
-  Room nextRoom = findRoom(destinationName);
-  if (nextRoom != null) {
-    player.setCurrentRoom(nextRoom);
-    incrementTurn();
-  }
-} else {
-  System.out.println("You can't go that way.");
-}
+System.out.println("You can't go that way.");
 }
 
 /*
 
-Logic for picking up items based on prerequisites.
+Handles picking up items.
 
-@param itemName the name of the item to take
+@param name The name of the item to take.
 */
-private void handleTake(String itemName) {
-Room current = player.getCurrentRoom();
+private void takeItem(String name) {
+Room room = player.getCurrentRoom();
 Item found = null;
 
-// Manual search in room
-for (Item item : current.getItems()) {
-  if (item.getName().equalsIgnoreCase(itemName)) {
+// Logic for Bathroom key requirement
+if (room.getName().equals("Bathroom") && name.equalsIgnoreCase("basement key")) {
+  if (!hasFlashlight) {
+    System.out.println("It's too dark to find anything in here!");
+    return;
+  }
+}
+
+for (Item item : room.getItems()) {
+  if (item.getName().equalsIgnoreCase(name)) {
     found = item;
     break;
   }
 }
 
 if (found != null) {
-  // Check prerequisites
-  if (itemName.equalsIgnoreCase("Basement Key") && !hasFlashlight) {
-    System.out.println("The shadows are too deep to see anything inside the medicine cabinet.");
-    return;
-  }
-
   player.addItem(found);
-  current.removeItem(itemName);
-  System.out.println("You took the " + itemName + ".");
-
-  // Set state flags
-  if (itemName.equalsIgnoreCase("Flashlight")) hasFlashlight = true;
-  if (itemName.equalsIgnoreCase("Basement Key")) hasBasementKey = true;
-  if (itemName.equalsIgnoreCase("Baseball Bat")) hasWeapon = true;
-
+  room.removeItem(name);
+  
+  // Update state flags
+  if (name.equalsIgnoreCase("flashlight")) hasFlashlight = true;
+  if (name.equalsIgnoreCase("basement key")) hasBasementKey = true;
+  if (name.equalsIgnoreCase("baseball bat")) hasWeapon = true;
+  
+  System.out.println("You took the " + name + ".");
   incrementTurn();
 } else {
-  System.out.println("There is no " + itemName + " here.");
+  System.out.println("That item isn't here.");
 }
 }
 
 /*
 
-Handles the custom interaction for eating food.
-*/
-private void handleEatFood() {
-if (player.getCurrentRoom().getName().equalsIgnoreCase("Dining Room") && !hasEatenFood) {
-hasEatenFood = true;
-incrementTurn();
-// 50/50 chance
-if (Math.random() < 0.5) {
-System.out.println("The food was poisoned! You collapse to the floor. Game Over.");
-isRunning = false;
-} else {
-System.out.println("The food was delicious and you feel energized.");
-}
-} else {
-System.out.println("There is nothing to eat here.");
-}
-}
-
-/*
-
-Handles the custom interaction for breaking the basement lock.
-*/
-private void handleBreakLock() {
-if (player.getCurrentRoom().getName().equalsIgnoreCase("Basement") && !hasBasementKey) {
-breakLock = true;
-System.out.println("The loud thuds seem to have woken something up. Examining your surroundings you find nothing unusual. Then, from behind a dark figure lunges at you with a jagged blade. The cold steel is the last thing you feel. Gameover.");
-isRunning = false;
-} else {
-System.out.println("There is no lock to break.");
-}
-}
-
-/*
-
-Increments the turn count and triggers turn-based logic.
+Increases the turn counter and triggers scheduled events.
 */
 private void incrementTurn() {
 turnCount++;
@@ -336,58 +297,120 @@ processTurn();
 
 /*
 
-Runs logic related to turn progression, such as NPC warnings.
+Handles per-turn logic and narrative warnings.
 */
-public void processTurn() {
+private void processTurn() {
 if (turnCount == 5) {
-System.out.println("\n[WARNING] You hear strange noises in the house.");
+System.out.println("You hear heavy footsteps somewhere deeper in the house.");
 } else if (turnCount == 10) {
-System.out.println("\n[WARNING] You hear Papa John moving closer.");
-} else if (turnCount == 15) {
-if (!hasWeapon) {
-System.out.println("\nPapa John has found you! Without a weapon, you cannot defend yourself. Game Over.");
+System.out.println("Papa John’s breathing sounds much closer now.");
+} else if (turnCount >= 15 && !hasWeapon) {
+System.out.println("Papa John has found you in the halls! Without a weapon, you cannot defend yourself. Game Over.");
 isRunning = false;
-} else {
-System.out.println("\nPapa John attacks! You use the Baseball Bat to defend yourself and survive.");
-}
 }
 }
 
 /*
 
-Resets all game state variables and the player's status.
+Evaluates win, loss, and trap conditions based on current state.
+
+@return true if the game should end, false otherwise.
 */
-private void resetGame() {
-player = new Player();
-rooms = new ArrayList();
-hasBasementKey = false;
-hasFlashlight = false;
-hasWeapon = false;
-hasEatenFood = false;
-breakLock = false;
-turnCount = 0;
-initializeWorld();
+private boolean checkConditions() {
+Room current = player.getCurrentRoom();
+
+// Trap: Storage from Garage
+if (current.getName().equals("Storage") && lastRoom != null && lastRoom.getName().equals("Garage")) {
+  System.out.println("DEATH TRAP. As you push open the black metal door from the Garage side, you trigger a hidden tripwire. Before you can even process the sight of the statues, a massive shelf loaded with rusted engine parts collapses from above, pinning you instantly. Game Over.");
+  isRunning = false;
+  return true;
+}
+
+// Trap: Garage from Storage
+if (current.getName().equals("Garage") && lastRoom != null && lastRoom.getName().equals("Storage")) {
+  System.out.println("DEATH TRAP. You step through the metal door into the garage, but the door slams shut behind you with a mechanical bang. The statues from the previous room begin to push against the wood, trapping you in the freezing dark as the locks hiss shut, leaving you with no way out. Game Over.");
+  isRunning = false;
+  return true;
+}
+
+// Living Room Encounter
+if (current.getName().equals("Living Room") && !hasWeapon) {
+  // Description already printed "Game Over" text via getDescription logic
+  isRunning = false;
+  return true;
+}
+
+// Break Lock Death
+if (breakLock) {
+  System.out.println("The loud thuds seem to have woken something up. Examining your surroundings you find nothing unusual. Then, from behind a dark figure lunges at you with a jagged blade. The cold steel is the last thing you feel. Gameover.");
+  isRunning = false;
+  return true;
+}
+
+// Win Condition
+if (current.getName().equals("Basement") && hasBasementKey) {
+  isRunning = false;
+  return true;
+}
+
+return false;
 }
 
 /*
 
-Finds a Room object in the global list by its name.
+Searches for a room by name using a for-each loop.
 
-@param name the name of the room to search for
+@param roomName The name of the room to find.
 
-@return the Room object if found, otherwise null
+@return The Room object or null if not found.
 */
-public Room findRoom(String name) {
+public Room findRoom(String roomName) {
+// Manual loop required - built-in search methods are not allowed per AP CS A constraints
 for (Room r : rooms) {
-if (r.getName().equalsIgnoreCase(name)) {
+if (r.getName().equalsIgnoreCase(roomName)) {
 return r;
 }
 }
 return null;
 }
 
-public boolean isHasBasementKey() { return hasBasementKey; }
-public boolean isHasFlashlight() { return hasFlashlight; }
-public boolean isHasWeapon() { return hasWeapon; }
-public boolean isHasEatenFood() { return hasEatenFood; }
+/*
+
+Getter for hasFlashlight flag.
+
+@return true if player has found a flashlight.
+*/
+public boolean isHasFlashlight() {
+return hasFlashlight;
+}
+
+/*
+
+Getter for hasBasementKey flag.
+
+@return true if player has the basement key.
+*/
+public boolean isHasBasementKey() {
+return hasBasementKey;
+}
+
+/*
+
+Getter for hasWeapon flag.
+
+@return true if player has the baseball bat.
+*/
+public boolean isHasWeapon() {
+return hasWeapon;
+}
+
+/*
+
+Getter for hasEatenFood flag.
+
+@return true if player has eaten the dining room food.
+*/
+public boolean isHasEatenFood() {
+return hasEatenFood;
+}
 }
