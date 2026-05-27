@@ -1,53 +1,32 @@
 import java.util.ArrayList;
 import java.util.Scanner;
 // --- FILE: Player.java ---
-import java.util.ArrayList;
 
 /*
 
-Tracks the main player inventory state and active spatial room positioning.
+Represents the player character in the game.
 
-Operates additions and reductions of components acquired via text interaction.
+This class manages the player's inventory and current location. It interacts
 
-Interacts directly with Game processes during item pickup and room navigation updates.
+with the Room and Item classes to facilitate movement and item collection.
 */
 public class Player {
-private ArrayList<Item> inventory;
+private ArrayList inventory;
 private Room currentRoom;
 
 /*
 
-Prepares a fresh player container with initialized empty list collections.
+Constructs a new Player.
 */
 public Player() {
-this.inventory = new ArrayList<Item>();
+this.inventory = new ArrayList();
 }
 
 /*
 
-Identifies where the player is currently positioned.
+Adds an item to the player's inventory.
 
-@return the active Room object reference
-*/
-public Room getCurrentRoom() {
-return currentRoom;
-}
-
-/*
-
-Sets the location parameter of the player character.
-
-@param room the new room anchor point
-*/
-public void setCurrentRoom(Room room) {
-this.currentRoom = room;
-}
-
-/*
-
-Safely appends an item object into the player's private inventory file.
-
-@param item the target object to save
+@param item the Item to add
 */
 public void addItem(Item item) {
 inventory.add(item);
@@ -55,28 +34,31 @@ inventory.add(item);
 
 /*
 
-Extracts an item component out of the personal tracking array list by positional integer.
+Removes an item from the player's inventory by name.
 
-@param index the index reference to destroy
+@param itemName the name of the item to remove
 */
-public void removeItem(int index) {
-inventory.remove(index);
+public void removeItem(String itemName) {
+// Manual loop required per constraints
+for (int i = 0; i < inventory.size(); i++) {
+if (inventory.get(i).getName().equalsIgnoreCase(itemName)) {
+inventory.remove(i);
+return;
+}
+}
 }
 
 /*
 
-Iterates inventory to search for matching names without using native list shortcuts.
+Finds an item in the inventory using a for-each loop.
 
-Manual loop required — built-in search methods are not allowed per AP CS A constraints.
+@param itemName the name of the item to find
 
-@param name the raw string sequence to find
-
-@return the matching discovered Item link, or null if missing
+@return the Item if found, otherwise null
 */
-public Item findItem(String name) {
-// Manual loop required — built-in search methods are not allowed per AP CS A constraints
+public Item findItem(String itemName) {
 for (Item item : inventory) {
-if (item.getName().equalsIgnoreCase(name)) {
+if (item.getName().equalsIgnoreCase(itemName)) {
 return item;
 }
 }
@@ -85,11 +67,31 @@ return null;
 
 /*
 
-Gets the full structural listing container of inventory items.
+Returns the player's current inventory.
 
-@return the explicit item array list tracking structure
+@return the ArrayList of Items
 */
-public ArrayList<Item> getInventory() {
+public ArrayList getInventory() {
 return inventory;
+}
+
+/*
+
+Returns the player's current room.
+
+@return the current Room object
+*/
+public Room getCurrentRoom() {
+return currentRoom;
+}
+
+/*
+
+Sets the player's current room.
+
+@param currentRoom the Room to move the player to
+*/
+public void setCurrentRoom(Room currentRoom) {
+this.currentRoom = currentRoom;
 }
 }
