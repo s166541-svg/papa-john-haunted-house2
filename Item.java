@@ -1,15 +1,15 @@
-import java.util.ArrayList;
-import java.util.Scanner;
 // --- FILE: Item.java ---
 /*
 
-Represents a generic item in the game world.
+Base class for all interactive objects in the game.
 
-This class serves as the base class for all items, demonstrating inheritance.
+This class provides the fundamental structure for items, including a name
 
-It is used by the Player and Room classes to manage collections of objects.
+and description. It serves as the parent for specialized item types like
+
+UtilityItem and WeaponItem.
 */
-public class Item {
+public abstract class Item {
 private String name;
 private String description;
 
@@ -17,9 +17,9 @@ private String description;
 
 Constructs a new Item with a name and description.
 
-@param name the name of the item
+@param name The display name of the item.
 
-@param description the description of what the item is
+@param description The detailed description of the item.
 */
 public Item(String name, String description) {
 this.name = name;
@@ -28,9 +28,9 @@ this.description = description;
 
 /*
 
-Returns the name of the item.
+Retrieves the name of the item.
 
-@return the item name
+@return The item's name.
 */
 public String getName() {
 return name;
@@ -38,19 +38,9 @@ return name;
 
 /*
 
-Returns the description of the item.
+Provides a string representation of the item for inventory display.
 
-@return the item description
-*/
-public String getDescription() {
-return description;
-}
-
-/*
-
-Provides a string representation of the item.
-
-@return the name of the item
+@return The item's name.
 */
 @Override
 public String toString() {
