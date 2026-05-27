@@ -1,32 +1,31 @@
-import java.util.ArrayList;
-import java.util.Scanner;
 // --- FILE: Player.java ---
+import java.util.ArrayList;
 
 /*
 
-Represents the player character in the game.
+Represents the human player in the game.
 
-This class manages the player's inventory and current location. It interacts
+This class tracks the player's current location and inventory.
 
-with the Room and Item classes to facilitate movement and item collection.
+It provides methods for item management and inventory searching.
 */
 public class Player {
-private ArrayList<Item> inventory;
 private Room currentRoom;
+private ArrayList inventory;
 
 /*
 
-Constructs a new Player.
+Constructs a new Player and initializes an empty inventory.
 */
 public Player() {
-this.inventory = new ArrayList();
+this.inventory = new ArrayList<>();
 }
 
 /*
 
 Adds an item to the player's inventory.
 
-@param item the Item to add
+@param item The Item to be added.
 */
 public void addItem(Item item) {
 inventory.add(item);
@@ -36,10 +35,10 @@ inventory.add(item);
 
 Removes an item from the player's inventory by name.
 
-@param itemName the name of the item to remove
+@param itemName The name of the item to remove.
 */
 public void removeItem(String itemName) {
-// Manual loop required per constraints
+// Manual loop required - built-in search methods are not allowed per AP CS A constraints
 for (int i = 0; i < inventory.size(); i++) {
 if (inventory.get(i).getName().equalsIgnoreCase(itemName)) {
 inventory.remove(i);
@@ -50,13 +49,14 @@ return;
 
 /*
 
-Finds an item in the inventory using a for-each loop.
+Finds an item in the player's inventory using a for-each loop.
 
-@param itemName the name of the item to find
+@param itemName The name of the item to search for.
 
-@return the Item if found, otherwise null
+@return The Item object if found, otherwise null.
 */
 public Item findItem(String itemName) {
+// Manual loop required - built-in search methods are not allowed per AP CS A constraints
 for (Item item : inventory) {
 if (item.getName().equalsIgnoreCase(itemName)) {
 return item;
@@ -67,19 +67,19 @@ return null;
 
 /*
 
-Returns the player's current inventory.
+Sets the player's current location.
 
-@return the ArrayList of Items
+@param room The Room the player is moving into.
 */
-public ArrayList getInventory() {
-return inventory;
+public void setCurrentRoom(Room room) {
+this.currentRoom = room;
 }
 
 /*
 
-Returns the player's current room.
+Gets the player's current location.
 
-@return the current Room object
+@return The current Room object.
 */
 public Room getCurrentRoom() {
 return currentRoom;
@@ -87,11 +87,11 @@ return currentRoom;
 
 /*
 
-Sets the player's current room.
+Gets the player's inventory list.
 
-@param currentRoom the Room to move the player to
+@return An ArrayList of Items.
 */
-public void setCurrentRoom(Room currentRoom) {
-this.currentRoom = currentRoom;
+public ArrayList getInventory() {
+return inventory;
 }
 }
