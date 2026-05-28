@@ -46,20 +46,20 @@ breakLock = false;
 
 // Room creation
 Room outside = new Room("Outside", "");
-Room mainEntrance = new Room("Main Entrance", "The moment you step inside, the door thuds shut, locking out the wind. The air here is stale and smells like old paper. It is very dim, and every step you take makes the floorboards groan like they are complaining. To the West, you hear a slow, heavy snoring sound—huff... wheeze...—as if something very big is dreaming nearby. To the East of you seems to be a kitchen. To the North of you is a bathroom.");
+Room mainEntrance = new Room("Main Entrance", "");
 Room bathroom = new Room("Bathroom", "");
 Room backyard = new Room("Backyard", "");
 Room storage = new Room("Storage", "");
-Room garage = new Room("Garage", "The dead silence in the garage creates a sense of fear and the cold air pierces your skin. In front of you there is a broken down school bus and a Papa John’s delivery car. Upon exploring, you find a baseball bat. A door leading to the dining room to the West of you and another leading to a Storage room North of you. Take the baseball bat? “Take Baseball Bat”");
+Room garage = new Room("Garage", "");
 Room diningRoom = new Room("Dining Room", "");
-Room kitchen = new Room("Kitchen", "The kitchen is the coldest part of the house. An old, white refrigerator shudders and shakes, making a low humming noise that never stops. Rusted cabinets hang open, showing rows of dusty jars filled with strange, murky liquids. A single faucet drips into the sink—drop... drop... drop—sounding like a ticking clock. To the North is the Dining Room and to the West is the Main Entrance.");
+Room kitchen = new Room("Kitchen", "The kitchen is the coldest part of the house. An old, white refrigerator shudders and shakes, making a low humming noise that never stops. Rusted cabinets hang open, showing rows of dusty jars filled with strange, murky liquids. A single faucet drips into the sink—drop... drop... drop—sounding like a ticking clock. To the North is the Dining Room, to the West is the Main Entrance, and to the East is the Garage.");
 Room livingRoom = new Room("Living Room", "");
 Room guestRoom = new Room("Guest Room", "The air here is heavy and still, filled with tiny bits of dust dancing in the dark. Long, grey cobwebs hang from the ceiling like messy decorations. A giant bed with a thick, tattered blanket sits in the center. It looks like someone just got up from a nap, leaving a deep dent in the middle of the mattress. To the North is the living room and to the East is the Main Entrance. Take the Flashlight? “Take Flashlight”");
 Room basement = new Room("Basement", "");
 
 // Exits
 outside.addExit("North", "Main Entrance");
-outside.addExit("East", "Backyard");
+outside.addExit("East", "Backyard");   
 outside.addExit("West", "Basement");
 
 mainEntrance.addExit("West", "Guest Room");
@@ -69,23 +69,24 @@ mainEntrance.addExit("South", "Outside");
 
 bathroom.addExit("South", "Main Entrance");
 
+backyard.addExit("West", "Outside"); 
 backyard.addExit("South", "Storage");
-backyard.addExit("West", "Outside");
 
 storage.addExit("South", "Garage");
 storage.addExit("West", "Dining Room");
 storage.addExit("North", "Backyard");
 
-garage.addExit("West", "Dining Room");
+garage.addExit("West", "Kitchen");
 garage.addExit("North", "Storage");
 
 diningRoom.addExit("West", "Living Room");
 diningRoom.addExit("South", "Kitchen");
-diningRoom.addExit("North East", "Storage");
-diningRoom.addExit("South East", "Garage");
+diningRoom.addExit("East", "Storage");
+
 
 kitchen.addExit("North", "Dining Room");
 kitchen.addExit("West", "Main Entrance");
+kitchen.addExit("East", "Garage");
 
 livingRoom.addExit("South", "Guest Room");
 livingRoom.addExit("East", "Dining Room");
@@ -121,22 +122,36 @@ lastRoom = null;
 Starts the game loop.
 */
 public void start() {
-Scanner sc = new Scanner(System.in);
-System.out.println("Welcome to Papa John's Haunted House!");
+    Scanner sc = new Scanner(System.in);
+    System.out.println("Welcome to Papa John's Haunted House!");
 
-while (isRunning) {
-  System.out.println("---");
-  System.out.println(player.getCurrentRoom().getName());
-  System.out.println(player.getCurrentRoom().getDescription(this));
-  
-  // Check for passive Room deaths/wins immediately after description
-  if (checkConditions()) break;
+    while (isRunning) {
+        System.out.println("---");
+        
+        // 1. CHECK CONDITIONS FIRST (This fixes the double description bug)
+        if (checkConditions()) break;
 
-  System.out.print("> ");
-  String input = sc.nextLine().toLowerCase();
-  processCommand(input);
+        // 2. PRINT DESCRIPTION ONLY IF ALIVE
+        System.out.println(player.getCurrentRoom().getName());
+        System.out.println(player.getCurrentRoom().getDescription(this));
+
+        System.out.print("> ");
+        String input = sc.nextLine().toLowerCase();
+        
+        if (input.equals("restart")) {
+            initializeGame();
+            System.out.println("\n\n--- GAME RESTARTED ---");
+            continue;
+        }
+        
+        processCommand(input);
+    }
+    sc.close();
 }
-sc.close();
+
+// Add this getter for the move counter requirement
+public int getTurnCount() {
+    return turnCount;
 }
 
 /*
@@ -179,19 +194,22 @@ if (input.startsWith("take ")) {
 }
 
 if (input.equals("eat food")) {
-  if (player.getCurrentRoom().getName().equals("Dining Room") && !hasEatenFood) {
-    hasEatenFood = true;
-    incrementTurn();
-    if (Math.random() < 0.5) {
-      System.out.println("The food was delicious and revitalizing!");
+    if (player.getCurrentRoom().getName().equalsIgnoreCase("Dining Room") && !hasEatenFood) {
+        hasEatenFood = true;
+        incrementTurn();
+        
+        // 50/50 Chance Logic
+        if (Math.random() < 0.5) {
+            System.out.println("The food is surprisingly fresh and gives you a strange burst of energy!");
+        } else {
+            System.out.println("As you swallow the last bite, your stomach twists in agony. " +
+                               "The food was tainted! You collapse beside the grand table. Game Over.");
+            isRunning = false; 
+        }
     } else {
-      System.out.println("The food was poisoned! You collapse to the floor. Game Over.");
-      isRunning = false;
+        System.out.println("There is no food here to eat.");
     }
-  } else {
-    System.out.println("There is no food here to eat.");
-  }
-  return;
+    return;
 }
 
 if (input.equals("break lock")) {
@@ -213,30 +231,32 @@ Handles player movement logic.
 @param direction The direction string provided by the user.
 */
 private void movePlayer(String direction) {
-Room current = player.getCurrentRoom();
+    Room current = player.getCurrentRoom();
 
-// Check for locked Basement
-if (current.getName().equals("Outside") && direction.equalsIgnoreCase("west")) {
-  if (!hasBasementKey) {
-    System.out.println("The cellar door is locked. You need a key.");
-    return;
-  }
-}
-
-// Logic for finding the exit
-for (String exitStr : current.getExits()) {
-  String[] parts = exitStr.split(":");
-  if (parts[0].equalsIgnoreCase(direction)) {
-    Room nextRoom = findRoom(parts[1]);
-    if (nextRoom != null) {
-      lastRoom = current;
-      player.setCurrentRoom(nextRoom);
-      incrementTurn();
-      return;
+    // 1. Check if the player is trying to leave the house
+    if (current.getName().equalsIgnoreCase("Main Entrance") && direction.equalsIgnoreCase("south")) {
+        if (!hasBasementKey) {
+            System.out.println("\nThe door has thudded shut and won't budge! You are trapped until you find the key.");
+            return; // Stops the movement
+        }
     }
-  }
-}
-System.out.println("You can't go that way.");
+
+    // 2. Standard exit checking logic
+    for (String exitStr : current.getExits()) {
+        String[] parts = exitStr.split(":"); // parts[0] is direction, parts[1] is destination
+        if (parts[0].equalsIgnoreCase(direction)) {
+            Room nextRoom = findRoom(parts[1]);
+            if (nextRoom != null) {
+                lastRoom = current;
+                player.setCurrentRoom(nextRoom);
+                incrementTurn();
+                return;
+            }
+        }
+    }
+    
+    // If the loop finishes and no exit was found
+    System.out.println("You can't go that way.");
 }
 
 /*
@@ -324,11 +344,15 @@ if (current.getName().equals("Garage") && lastRoom != null && lastRoom.getName()
 }
 
 // Living Room Encounter
-if (current.getName().equals("Living Room") && !hasWeapon) {
-  // Description already printed "Game Over" text via getDescription logic
-  isRunning = false;
-  return true;
-}
+if (current.getName().equalsIgnoreCase("Living Room") && !hasWeapon) {
+        System.out.println("---");
+        System.out.println(current.getName());
+        // This calls the "Game Over" version of the description in Room.java
+        System.out.println(current.getDescription(this)); 
+        
+        isRunning = false;
+        return true; // Stop the game loop immediately
+    }
 
 // Break Lock Death
 if (breakLock) {
@@ -338,12 +362,17 @@ if (breakLock) {
 }
 
 // Win Condition
-if (current.getName().equals("Basement") && hasBasementKey) {
-  isRunning = false;
-  return true;
-}
+if (current.getName().equalsIgnoreCase("Basement") && hasBasementKey) {
+        // Print the final victory description immediately
+        System.out.println(current.getName());
+        System.out.println(current.getDescription(this));
+        
+        System.out.println("\nCongratulations! You escaped with the loot and survived Papa John!");
+        isRunning = false;
+        return true; 
+    }
 
-return false;
+    return false;
 }
 
 /*
@@ -407,3 +436,4 @@ public boolean isBreakLock() {
 return breakLock;
 }
 }
+
