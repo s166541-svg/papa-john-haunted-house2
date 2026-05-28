@@ -1,13 +1,16 @@
 // --- FILE: Main.java ---
 /*
-* Serves as the primary entry point framework execution driver for the application.
-* Boots up resources by initializing a Game architecture object instance, then delegates
-* tracking to the active core loops.
+
+Entry point for the Papa John's Haunted House game.
+
+This class instantiates the Game and begins the execution loop.
 */
 public class Main {
-/**
-* Main runtime program execution sequence.
-* @param args command-line structural arrays passed into program execution
+/*
+
+Main method to start the program.
+
+@param args Command line arguments
 */
 public static void main(String[] args) {
 Game game = new Game();

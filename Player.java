@@ -1,4 +1,3 @@
-// --- FILE: Player.java ---
 import java.util.ArrayList;
 
 /*
@@ -9,79 +8,79 @@ This class tracks the player's current location and inventory.
 It provides methods for item management and inventory searching.
 */
 public class Player {
-private Room currentRoom;
-private ArrayList<Item> inventory;
+    private Room currentRoom;
+    private ArrayList<Item> inventory;
 
-/*
-Constructs a new Player and initializes an empty inventory.
-*/
-public Player() {
-this.inventory = new ArrayList<Item>();
-}
+    /*
+    Constructs a new Player and initializes an empty inventory.
+    */
+    public Player() {
+        this.inventory = new ArrayList<Item>();
+    }
 
-/*
-Adds an item to the player's inventory.
+    /*
+    Adds an item to the player's inventory.
 
-@param item The Item to be added.
-*/
-public void addItem(Item item) {
-inventory.add(item);
-}
+    @param item The Item to be added.
+    */
+    public void addItem(Item item) {
+        inventory.add(item);
+    }
 
-/*
-Removes an item from the player's inventory by name.
+    /*
+    Removes an item from the player's inventory by name.
 
-@param itemName The name of the item to remove.
-*/
-public void removeItem(String itemName) {
-for (int i = 0; i < inventory.size(); i++) {
-if (inventory.get(i).getName().equalsIgnoreCase(itemName)) {
-inventory.remove(i);
-return;
-}
-}
-}
+    @param itemName The name of the item to remove.
+    */
+    public void removeItem(String itemName) {
+        for (int i = 0; i < inventory.size(); i++) {
+            if (inventory.get(i).getName().equalsIgnoreCase(itemName)) {
+                inventory.remove(i);
+                return;
+            }
+        }
+    }
 
-/*
-Finds an item in the player's inventory using a for-each loop.
+    /*
+    Finds an item in the player's inventory using a for-each loop.
 
-@param itemName The name of the item to search for.
+    @param itemName The name of the item to search for.
 
-@return The Item object if found, otherwise null.
-*/
-public Item findItem(String itemName) {
-for (Item item : inventory) {
-if (item.getName().equalsIgnoreCase(itemName)) {
-return item;
-}
-}
-return null;
-}
+    @return The Item object if found, otherwise null.
+    */
+    public Item findItem(String itemName) {
+        for (Item item : inventory) {
+            if (item.getName().equalsIgnoreCase(itemName)) {
+                return item;
+            }
+        }
+        return null;
+    }
 
-/*
-Sets the player's current location.
+    /*
+    Sets the player's current location.
 
-@param room The Room the player is moving into.
-*/
-public void setCurrentRoom(Room room) {
-this.currentRoom = room;
-}
+    @param room The Room the player is moving into.
+    */
+    public void setCurrentRoom(Room room) {
+        this.currentRoom = room;
+    }
 
-/*
-Gets the player's current location.
+    /*
+    Gets the player's current location.
 
-@return The current Room object.
-*/
-public Room getCurrentRoom() {
-return currentRoom;
-}
+    @return The current Room object.
+    */
+    public Room getCurrentRoom() {
+        return currentRoom;
+    }
 
-/*
-Gets the player's inventory list.
+    /*
+    Gets the player's inventory list.
 
-@return An ArrayList of Items.
-*/
-public ArrayList<Item> getInventory() {
-return inventory;
-}
+    @return An ArrayList of Items.
+    */
+    public ArrayList<Item> getInventory() {
+        return inventory;
+    }
 }
